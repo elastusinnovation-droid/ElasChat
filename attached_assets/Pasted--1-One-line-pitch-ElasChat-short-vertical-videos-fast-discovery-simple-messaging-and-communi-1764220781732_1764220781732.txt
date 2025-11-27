@@ -1,0 +1,170 @@
+
+1 — One-line pitch
+
+ElasChat — short vertical videos, fast discovery, simple messaging, and community tools (no ads, focus on local creators).
+
+2 — Core features
+	•	Vertical full-screen video feed (swipe up/down).
+	•	Like, comment, share, save, duet/ remix.
+	•	Short video recorder with filters, music, captions, basic editing (trim, speed, cover frame).
+	•	Followed / For You / Nearby / Trending feeds.
+	•	User profiles with grid (videos) + highlights.
+	•	In-app direct messages and notifications.
+	•	Search (users, hashtags, sounds).
+	•	Simple moderation tools + reporting.
+	•	Onboarding + privacy settings.
+
+3 — Main navigation (bottom tab bar)
+	1.	Home (vertical feed) — icon: home/video note
+	2.	Discover (search + trends) — magnifier
+	3.	Create (big center FAB) — record button (primary action)
+	4.	Messages — chat bubble
+	5.	Profile — user circle
+
+4 — Screen-by-screen wireframe copy (Figma-ready text + layout)
+
+Use these as frame titles and element labels.
+
+Home: “Home / For You”
+
+Top bar:
+	•	Left: logo (ElasChat) — small
+	•	Center: Tab selector: [Following] [For You] [Nearby] (underline shows active)
+	•	Right: Upload icon, Notifications bell
+
+Main area (full screen card layout, one video per screen):
+	•	Video area: video (full-screen)
+	•	Overlays (right side vertical stack):
+	•	Profile pic (tap → open profile)
+	•	Follow / Following button (below profile pic)
+	•	Like button — count (heart)
+	•	Comment button — count (comment bubble)
+	•	Share button — count (arrow)
+	•	More (⋯) (report, save, link)
+	•	Bottom left overlay:
+	•	Username: @elastus (tap → profile)
+	•	Sound title: ♪ Original sound - ElasChat (tap → sound page)
+	•	Caption: “Short caption with #hashtags”
+	•	Bottom center small progress bar for video length
+	•	Swipe up shows next video
+
+Discover
+
+Top:
+	•	Search input placeholder: “Search users, hashtags, sounds”
+	•	Trending hashtags chips: #fun #mbala #fyp…
+Grid area:
+	•	Two-column video thumbnail grid with play overlay and stats (likes).
+
+Create (Record)
+
+Screen layout:
+	•	Top: Flash, Camera flip, Timer
+	•	Center: Big record button (tap to record / hold for clip), left side length indicator (0:00 / 0:15), right side effects icons
+	•	Bottom: Upload from gallery, Add music, Filters, Speed, Timer
+After recording:
+	•	Edit screen: Trim handles, Add text (editable timeline), Stickers, Filters, Voiceover, Cover frame picker
+	•	Post screen: Input caption, hashtags, tag people, privacy (Public / Friends / Private), allow duets: toggle, Save to drafts, Post button (primary)
+
+Profile
+
+Top:
+	•	Cover area: background (optional)
+Below:
+	•	Avatar, Display name, @handle, Bio text (editable)
+	•	Follow button (or Edit Profile for self)
+	•	Stats row: Posts | Followers | Following
+Tabs: Grid / Videos / Liked
+Grid: 3-column thumbnails
+
+Messages
+	•	Left: Search messages
+	•	List: Chat preview with name, last message, time, unread badge
+	•	Chat screen: message bubbles, send button, attach video/gif, react to messages
+
+Notifications
+	•	List of activity items (likes, comments, follows, mentions). Each item tappable.
+
+Settings & Privacy
+	•	Account: email, phone, change password
+	•	Privacy: account visibility, messages from, block list
+	•	Safety: report, community guidelines
+	•	About: terms, logout
+
+5 — Visual style guide (starter)
+	•	Brand name: ElasChat (logo uses playful rounded sans)
+	•	Primary color: #1E88E5 (bright blue) — use for CTA and record accents
+	•	Accent color: #FF6B6B (warm coral) — for likes/alerts
+	•	Background: dark mode default — #0F0F10 (very dark) and light text #FFFFFF
+	•	Surface / cards (light mode alternative): #FFFFFF with text #111827
+	•	Typography:
+	•	Headings: Inter Bold 18–20pt
+	•	Body: Inter Regular 14pt
+	•	UI labels: Inter Medium 12–13pt
+	•	Iconography: simple line icons with 24px touch targets
+	•	Corner radius: 12px for buttons, 6px for avatars
+	•	Motion: smooth vertical swipe transitions, subtle bounce on follow/like
+
+6 — Component list (reusable)
+	•	VerticalVideoCard (video, overlays, actions)
+	•	BottomTabBar with center floating Create FAB
+	•	Modal sheet (for comments, shares)
+	•	Chip (trending hash)
+	•	ProfileCard (avatar + follow)
+	•	Composer (text + hashtag suggestions)
+
+7 — UX microcopy (examples)
+	•	Onboarding welcome: “Welcome to ElasChat — make short videos, share stories, and discover local creators.”
+	•	Empty feed: “Nothing here yet. Follow creators or explore Discover.”
+	•	Post success: “Your video was posted!”
+	•	Follow confirmation: “You’re now following @username”
+
+8 — Simple data model (starter)
+
+Entities:
+	•	User { id, username, displayName, bio, avatarUrl, followersCount, followingCount, privacySetting }
+	•	Video { id, userId, videoUrl, coverUrl, caption, hashtags[], soundId, likesCount, commentsCount, createdAt, privacy }
+	•	Comment { id, videoId, userId, text, likesCount, createdAt }
+	•	Like { id, userId, targetId(type:video/comment), createdAt }
+	•	Message { id, fromUserId, toUserId, content(type:text/video), createdAt }
+
+9 — Basic tech suggestions (fast MVP)
+	•	Backend: Firebase (Auth, Firestore, Storage) for MVP — simple to integrate for auth, storing video metadata, and hosting videos on Cloud Storage + signed URLs.
+	•	Realtime: Firestore listeners for feed updates and messages.
+	•	Video processing: encode uploads on serverless function (Cloud Functions) to generate web-optimized mp4 + thumbnails.
+	•	Push notifications: Firebase Cloud Messaging.
+	•	Client: React Native (Expo) or native iOS/Android. For fastest start use React Native + Expo managed workflow (but note native video features may need custom modules).
+	•	Moderation: automated profanity filter + manual reviews, reporting flag in UX.
+
+10 — Privacy & safety (must have)
+	•	Option to make account private.
+	•	Report and block on every profile and content card.
+	•	Parental / age gate: require birthdate, block age-restricted features under 13 (or follow local law).
+	•	Terms & Community Guidelines link at signup.
+
+11 — Example Figma frame names & copy ready to paste
+	•	Home / For You — TopTabs: Following | For You | Nearby — Feed: VideoCard
+	•	Discover — Search input placeholder: Search users, hashtags, sounds — Chips: #trending
+	•	Record — Buttons: Flash | Flip | Timer — Record CTA: Hold to record
+	•	Edit / Post — Fields: Caption..., Add hashtags, Tag people, Who can view this? (Public/Friends/Private) — CTA: Post
+
+12 — Launch checklist (MVP)
+	1.	Auth flows (email, phone, social)
+	2.	Video upload + playback (webm/mp4 for mobile)
+	3.	Vertical feed with infinite scroll (cursor pagination)
+	4.	Like/comment/share basics
+	5.	Record + basic editing + music attach
+	6.	Profiles + follow/unfollow
+	7.	Messages (1:1)
+	8.	Notifications + basic moderation
+	9.	Analytics (events: post, like, follow, share)
+	10.	App store listing assets (screenshots, short promo video)
+
+13 — Optional cool extras to add later
+	•	Local hashtags / geotagged Nearby feed.
+	•	Collabs / Duets with split-screen.
+	•	Creator monetization (tips or badges).
+	•	Hashtag challenge pages with pinned winners.
+	•	Video drafts and scheduled posting.
+
+⸻
