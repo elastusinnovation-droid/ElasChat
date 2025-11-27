@@ -12,7 +12,7 @@ import { Feather } from "@expo/vector-icons";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
-import { Spacing, BorderRadius, Fonts } from "@/constants/theme";
+import { Spacing, BorderRadius, Fonts, Colors } from "@/constants/theme";
 
 export type ErrorFallbackProps = {
   error: Error;
@@ -58,12 +58,14 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
       ) : null}
 
       <View style={styles.content}>
-        <ThemedText type="h1" style={styles.title}>
-          Something went wrong
+        <Feather name="video-off" size={64} color={Colors.dark.primary} />
+        
+        <ThemedText type="h2" style={styles.title}>
+          Oops! ElasChat hit a snag
         </ThemedText>
 
         <ThemedText type="body" style={styles.message}>
-          Please reload the app to continue.
+          Something went wrong, but don't worry - your videos are safe. Let's get you back to creating!
         </ThemedText>
 
         <Pressable
@@ -71,7 +73,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
           style={({ pressed }) => [
             styles.button,
             {
-              backgroundColor: theme.link,
+              backgroundColor: Colors.dark.primary,
               opacity: pressed ? 0.9 : 1,
               transform: [{ scale: pressed ? 0.98 : 1 }],
             },
@@ -81,7 +83,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
             type="body"
             style={[styles.buttonText, { color: theme.buttonText }]}
           >
-            Try Again
+            Reload ElasChat
           </ThemedText>
         </Pressable>
       </View>
@@ -161,12 +163,11 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: "center",
-    lineHeight: 40,
+    marginTop: Spacing.lg,
   },
   message: {
     textAlign: "center",
     opacity: 0.7,
-    lineHeight: 24,
   },
   topButton: {
     position: "absolute",
@@ -185,6 +186,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.md,
     paddingHorizontal: Spacing["2xl"],
     minWidth: 200,
+    marginTop: Spacing.md,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

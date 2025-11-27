@@ -1,52 +1,106 @@
-import React from "react";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Card } from "@/components/Card";
-import { ScreenFlatList } from "@/components/ScreenFlatList";
-import Spacer from "@/components/Spacer";
+import React, { useState, useRef, useCallback } from "react";
+import { View, StyleSheet, FlatList, Dimensions, Pressable } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Feather } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+import { VideoCard } from "@/components/VideoCard";
+import { FeedTabs } from "@/components/FeedTabs";
+import { IconButton } from "@/components/IconButton";
+import { useTheme } from "@/hooks/useTheme";
 import { Spacing } from "@/constants/theme";
+import { mockVideos } from "@/data/mockData";
+import type { HomeStackParamList } from "@/navigation/HomeStackNavigator";
 
-type HomeStackParamList = {
-  Home: undefined;
-  Detail: undefined;
-};
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
+const TABS = ["Following", "For You", "Nearby"];
 
-type HomeScreenProps = {
-  navigation: NativeStackNavigationProp<HomeStackParamList, "Home">;
-};
+type NavigationProp = NativeStackNavigationProp<HomeStackParamList>;
 
-interface CardData {
-  id: string;
-  elevation: number;
-}
+export default function HomeScreen() {
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  const navigation = useNavigation<NavigationProp>();
+  const [activeTab, setActiveTab] = useState("For You");
+  const flatListRef = useRef<FlatList>(null);
 
-const CARD_DATA: CardData[] = [
-  { id: "1", elevation: 1 },
-  { id: "2", elevation: 2 },
-  { id: "3", elevation: 3 },
-  { id: "4", elevation: 1 },
-  { id: "5", elevation: 2 },
-  { id: "6", elevation: 3 },
-  { id: "7", elevation: 1 },
-  { id: "8", elevation: 2 },
-  { id: "9", elevation: 3 },
-];
+  const handleUserPress = useCallback((userId: string) => {
+    navigation.navigate("UserProfile", { userId });
+  }, [navigation]);
 
-export default function HomeScreen({ navigation }: HomeScreenProps) {
-  const renderItem = ({ item }: { item: CardData }) => (
-    <>
-      <Card
-        elevation={item.elevation}
-        onPress={() => navigation.navigate("Detail")}
-      />
-      <Spacer height={Spacing.lg} />
-    </>
-  );
+  const handleCommentPress = useCallback((videoId: string) => {
+    navigation.navigate("Comments", { videoId });
+  }, [navigation]);
+
+  const renderVideo = useCallback(({ item }: { item: typeof mockVideos[0] }) => (
+    <VideoCard
+      video={item}
+      onUserPress={() => handleUserPress(item.userId)}
+      onCommentPress={() => handleCommentPress(item.id)}
+    />
+  ), [handleUserPress, handleCommentPress]);
+
+  const keyExtractor = useCallback((item: typeof mockVideos[0]) => item.id, []);
 
   return (
-    <ScreenFlatList
-      data={CARD_DATA}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id}
-    />
+    <View style={[styles.container, { backgroundColor: "#000" }]}>
+      <FlatList
+        ref={flatListRef}
+        data={mockVideos}
+        renderItem={renderVideo}
+        keyExtractor={keyExtractor}
+        pagingEnabled
+        showsVerticalScrollIndicator={false}
+        snapToInterval={SCREEN_HEIGHT}
+        decelerationRate="fast"
+        bounces={false}
+      />
+
+      <View style={[styles.header, { paddingTop: insets.top + Spacing.sm }]}>
+        <View style={styles.headerLeft}>
+          <IconButton name="tv" size={22} color="#FFFFFF" />
+        </View>
+
+        <FeedTabs
+          tabs={TABS}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
+
+        <View style={styles.headerRight}>
+          <IconButton
+            name="bell"
+            size={22}
+            color="#FFFFFF"
+            onPress={() => navigation.navigate("Notifications")}
+          />
+        </View>
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: Spacing.sm,
+    zIndex: 10,
+  },
+  headerLeft: {
+    width: 50,
+  },
+  headerRight: {
+    width: 50,
+    alignItems: "flex-end",
+  },
+});

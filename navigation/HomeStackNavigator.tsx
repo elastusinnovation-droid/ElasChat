@@ -1,14 +1,18 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "@/screens/HomeScreen";
-import DetailScreen from "@/screens/DetailScreen";
+import NotificationsScreen from "@/screens/NotificationsScreen";
+import CommentsScreen from "@/screens/CommentsScreen";
+import UserProfileScreen from "@/screens/UserProfileScreen";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { useTheme } from "@/hooks/useTheme";
 import { getCommonScreenOptions } from "@/navigation/screenOptions";
 
 export type HomeStackParamList = {
   Home: undefined;
-  Detail: undefined;
+  Notifications: undefined;
+  Comments: { videoId: string };
+  UserProfile: { userId: string };
 };
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
@@ -26,13 +30,26 @@ export default function HomeStackNavigator() {
         name="Home"
         component={HomeScreen}
         options={{
-          headerTitle: () => <HeaderTitle title="My App" />,
+          headerTitle: () => <HeaderTitle title="ElasChat" />,
         }}
       />
       <Stack.Screen
-        name="Detail"
-        component={DetailScreen}
-        options={{ headerTitle: "Detail" }}
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{ headerTitle: "Notifications" }}
+      />
+      <Stack.Screen
+        name="Comments"
+        component={CommentsScreen}
+        options={{ 
+          headerTitle: "Comments",
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
+        name="UserProfile"
+        component={UserProfileScreen}
+        options={{ headerTitle: "" }}
       />
     </Stack.Navigator>
   );

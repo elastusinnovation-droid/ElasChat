@@ -1,33 +1,29 @@
 import React, { useState } from "react";
 import { View, StyleSheet, Pressable, ScrollView } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useRoute, RouteProp } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 
 import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
 import { Avatar } from "@/components/Avatar";
 import { Button } from "@/components/Button";
 import { VideoThumbnail } from "@/components/VideoThumbnail";
-import { IconButton } from "@/components/IconButton";
 import { useTheme } from "@/hooks/useTheme";
-import { useAuth } from "@/contexts/AuthContext";
 import { useScreenInsets } from "@/hooks/useScreenInsets";
-import { Spacing, BorderRadius, Colors } from "@/constants/theme";
-import { mockVideos, formatCount } from "@/data/mockData";
-import type { ProfileStackParamList } from "@/navigation/ProfileStackNavigator";
+import { Spacing, Colors } from "@/constants/theme";
+import { mockUsers, mockVideos, formatCount } from "@/data/mockData";
+import type { HomeStackParamList } from "@/navigation/HomeStackNavigator";
 
-type NavigationProp = NativeStackNavigationProp<ProfileStackParamList>;
+type UserProfileRouteProp = RouteProp<HomeStackParamList, "UserProfile">;
 
-export default function ProfileScreen() {
+export default function UserProfileScreen() {
   const { theme } = useTheme();
-  const { user } = useAuth();
   const { paddingTop, paddingBottom } = useScreenInsets();
-  const navigation = useNavigation<NavigationProp>();
+  const route = useRoute<UserProfileRouteProp>();
+  const [isFollowing, setIsFollowing] = useState(false);
   const [activeTab, setActiveTab] = useState<"videos" | "liked">("videos");
 
-  const userVideos = mockVideos.slice(0, 3);
+  const user = mockUsers.find((u) => u.id === route.params.userId) || mockUsers[0];
+  const userVideos = mockVideos.filter((v) => v.userId === user.id);
 
   return (
     <ScrollView
@@ -35,29 +31,21 @@ export default function ProfileScreen() {
       contentContainerStyle={{ paddingTop, paddingBottom }}
       showsVerticalScrollIndicator={false}
     >
-      <View style={styles.header}>
-        <View style={styles.headerActions}>
-          <View style={{ width: 44 }} />
-          <ThemedText type="h4">@{user?.username || "username"}</ThemedText>
-          <IconButton
-            name="settings"
-            size={24}
-            onPress={() => navigation.navigate("Settings")}
-          />
-        </View>
-      </View>
-
       <View style={styles.profileSection}>
-        <Avatar name={user?.displayName || "User"} size={90} />
+        <Avatar name={user.displayName} size={90} />
 
         <ThemedText type="h3" style={styles.displayName}>
-          {user?.displayName || "Display Name"}
+          {user.displayName}
+        </ThemedText>
+
+        <ThemedText style={[styles.username, { color: theme.textSecondary }]}>
+          @{user.username}
         </ThemedText>
 
         <View style={styles.statsRow}>
           <Pressable style={styles.statItem}>
             <ThemedText style={styles.statValue}>
-              {formatCount(user?.followingCount || 0)}
+              {formatCount(user.followingCount)}
             </ThemedText>
             <ThemedText style={[styles.statLabel, { color: theme.textSecondary }]}>
               Following
@@ -66,7 +54,7 @@ export default function ProfileScreen() {
 
           <Pressable style={styles.statItem}>
             <ThemedText style={styles.statValue}>
-              {formatCount(user?.followersCount || 0)}
+              {formatCount(user.followersCount)}
             </ThemedText>
             <ThemedText style={[styles.statLabel, { color: theme.textSecondary }]}>
               Followers
@@ -75,7 +63,7 @@ export default function ProfileScreen() {
 
           <Pressable style={styles.statItem}>
             <ThemedText style={styles.statValue}>
-              {formatCount(user?.postsCount || 0)}
+              {formatCount(user.postsCount)}
             </ThemedText>
             <ThemedText style={[styles.statLabel, { color: theme.textSecondary }]}>
               Posts
@@ -83,7 +71,7 @@ export default function ProfileScreen() {
           </Pressable>
         </View>
 
-        {user?.bio ? (
+        {user.bio ? (
           <ThemedText style={[styles.bio, { color: theme.textSecondary }]}>
             {user.bio}
           </ThemedText>
@@ -91,11 +79,24 @@ export default function ProfileScreen() {
 
         <View style={styles.actionButtons}>
           <Button
-            onPress={() => navigation.navigate("EditProfile")}
-            style={[styles.editButton, { backgroundColor: theme.backgroundSecondary }]}
+            onPress={() => setIsFollowing(!isFollowing)}
+            style={[
+              styles.followButton,
+              {
+                backgroundColor: isFollowing ? theme.backgroundSecondary : theme.primary,
+              },
+            ]}
+          >
+            <ThemedText style={{ color: isFollowing ? theme.text : "#FFFFFF", fontWeight: "600" }}>
+              {isFollowing ? "Following" : "Follow"}
+            </ThemedText>
+          </Button>
+
+          <Button
+            style={[styles.messageButton, { backgroundColor: theme.backgroundSecondary }]}
           >
             <ThemedText style={{ color: theme.text, fontWeight: "600" }}>
-              Edit Profile
+              Message
             </ThemedText>
           </Button>
         </View>
@@ -157,14 +158,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    paddingHorizontal: Spacing.xl,
-  },
-  headerActions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   profileSection: {
     alignItems: "center",
     paddingHorizontal: Spacing.xl,
@@ -172,6 +165,10 @@ const styles = StyleSheet.create({
   },
   displayName: {
     marginTop: Spacing.md,
+  },
+  username: {
+    marginTop: Spacing.xs,
+    fontSize: 14,
   },
   statsRow: {
     flexDirection: "row",
@@ -199,9 +196,13 @@ const styles = StyleSheet.create({
     marginTop: Spacing.lg,
     gap: Spacing.md,
   },
-  editButton: {
+  followButton: {
     flex: 1,
-    maxWidth: 200,
+    maxWidth: 140,
+  },
+  messageButton: {
+    flex: 1,
+    maxWidth: 140,
   },
   tabsContainer: {
     flexDirection: "row",
